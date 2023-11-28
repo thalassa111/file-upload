@@ -14,11 +14,12 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     public int id;
 
-    public User(String name, String email, String address, String password){
+    public User(String name, String email, String address, String password, String salt){
         this.name = name;
         this.email = email;
         this.address = address;
         this.password = password;
+        this.salt = salt;
     }
 
     @Column(nullable = false)
@@ -32,4 +33,7 @@ public class User {
 
     @Column(nullable = false)
     public String password;
+
+    @Column(nullable = false)
+    public String salt;
 }
