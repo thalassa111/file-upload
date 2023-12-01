@@ -50,4 +50,33 @@ public class UserService {
         }
         return "wrong password";
     }
+
+    public String verifyToken(String token) {
+        boolean isValid = JwtUtil.verifyToken(token);
+        if(isValid){
+            String id = JwtUtil.getSubjectFromToken(token);
+            User user = userRepository.findById(Integer.parseInt(id));
+            return "Token is valid name: " + user.getName() + "  id: " + user.getId();
+        }
+        else {
+            return "invalid token";
+        }
+    }
+
+    public boolean verifyTokenBoolean(String token) {
+        boolean isValid = JwtUtil.verifyToken(token);
+        if(isValid){
+            String id = JwtUtil.getSubjectFromToken(token);
+            User user = userRepository.findById(Integer.parseInt(id));
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+
+    public User getUserByToken(String token) {
+        String subject = JwtUtil.getSubjectFromToken(token);
+        return userRepository.findById(Integer.parseInt(subject));
+    }
 }

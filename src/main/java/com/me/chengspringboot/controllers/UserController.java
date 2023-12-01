@@ -6,10 +6,7 @@ import com.me.chengspringboot.models.User;
 import com.me.chengspringboot.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 public class UserController {
@@ -24,8 +21,8 @@ public class UserController {
     //register a new user
     @PostMapping("/user/register")
     public ResponseEntity<String> addUser(@RequestBody UserDto userDto){
-        userService.createCustomer(userDto);
-        return ResponseEntity.ok("customer added: " + userDto.getName());
+        User tmp = userService.createCustomer(userDto);
+        return ResponseEntity.ok("customer added: " + tmp.getName());
     }
 
     //will generate a token for a user who provide a correct email and password
@@ -33,5 +30,17 @@ public class UserController {
     public ResponseEntity<String> login(@RequestBody LoginRequestDto loginRequestDto){
         return ResponseEntity.ok(userService.generateTokenForUserByEmailAndPassword(loginRequestDto.email, loginRequestDto.password));
     }
+
+    //used to verify the token, nice to have for testing
+    @GetMapping("/user/verify-token")
+    public String verifyToken(@RequestParam String token){
+        return userService.verifyToken(token);
+    }
+
+    @GetMapping("/user/get-user")
+    public ResponseEntity<User> getUser(@RequestParam String token){
+        return ResponseEntity.ok(userService.getUserByToken(token));
+    }
+
 
 }
