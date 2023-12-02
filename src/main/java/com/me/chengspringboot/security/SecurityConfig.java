@@ -32,7 +32,9 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/user/**").permitAll()
                         .requestMatchers("/folder/**").permitAll()
-                        .anyRequest().authenticated()
+                        .requestMatchers("/files/**").permitAll()
+                                .anyRequest().permitAll()
+                        /*.anyRequest().authenticated()*/
                 )
                 .httpBasic(Customizer.withDefaults())
                 .csrf(csrf -> csrf.disable());

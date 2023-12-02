@@ -76,6 +76,7 @@ public class UserService {
     }
 
     public User getUserByToken(String token) {
+        //gets id from token
         String subject = JwtUtil.getSubjectFromToken(token);
         return userRepository.findById(Integer.parseInt(subject));
     }
