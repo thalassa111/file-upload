@@ -26,7 +26,7 @@ public class FileService {
         this.fileRepository = fileRepository;
         this.folderRepository = folderRepository;
     }
-
+    //method uploads a file, which is sent in as third argument. First argument is token, and second is the id of the folder to upload to
     public ResponseEntity<String> uploadFile(String token, int folderId, MultipartFile file) {
         //verify if token if valid
         if (JwtUtil.verifyToken(token)) {
@@ -41,13 +41,13 @@ public class FileService {
                     boolean fileNameExists = fileRepository.existsByFileNameAndFolder(file.getOriginalFilename(), folder);
                     int count = 0;
                     String fileName = file.getOriginalFilename();
-                    //loop until the filename doesnt exist anymore in the folder, then continue with the name adding (x) to the filename
+                    //loop until the fileNameExists doesnt exist anymore in the folder, then continue with the name adding (x) to the filename
                     while(fileNameExists){
                         count++;
                         fileNameExists = fileRepository.existsByFileNameAndFolder(StringUtil.getNewFileName(fileName, count), folder);
                         System.out.println("filename is taking, count: " + count);
                     }
-                    //if nothing happened, no filename conflict, skip this and file will keep the initial filename, or else give a new name
+                    //if nothing happened, no filename conflict, skip this and file will keep the initial filename, or else give a new name with the added (x)
                     if(count != 0){ fileName = StringUtil.getNewFileName(file.getOriginalFilename(), count); }
                     //save file to database, max size is 1MB
                     File fileEntity = new File();
@@ -64,6 +64,32 @@ public class FileService {
                         .body("Error processing the file: " + e.getMessage());
             }
         } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token is not valid");
+        }
+    }
+
+    //method for deleting a file, the filename is sent in as third argument, and first one is token, and second one is the folderId of the file
+    public ResponseEntity<String> deleteFile(String token, int folderId, String fileName) {
+        //verify if token is valid
+        if(JwtUtil.verifyToken(token)){
+            //get id from token
+            String userId = JwtUtil.getSubjectFromToken(token);
+            Optional<Folder> optionalFolder = folderRepository.findByIdAndUser_Id(folderId, Integer.parseInt(userId));
+            // Verify if the folder with correct ID exists
+            if (optionalFolder.isPresent()) {
+                Folder folder = optionalFolder.get();
+                //check if file exists in the current folder
+                if(fileRepository.existsByFileNameAndFolder(fileName, folder)){
+                    //delete the file
+                    fileRepository.deleteFileByFileName(fileName);
+                    return ResponseEntity.ok("file -> " + fileName + " from folder with id -> " + folderId +" has been deleted successfully");
+                } else{
+                    return ResponseEntity.status(HttpStatus.NOT_FOUND).body("File not found on current user");
+                }
+            } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Folder not found for the current user");
+            }
+        }else {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token is not valid");
         }
     }
