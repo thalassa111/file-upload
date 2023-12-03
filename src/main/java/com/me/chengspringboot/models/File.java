@@ -16,6 +16,7 @@ public class File {
     private String fileName;
 
     @Lob
+    @Column
     private byte[] fileContent;
 
     //Reference to the folder that this file belong to

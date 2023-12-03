@@ -22,4 +22,11 @@ public class FileController {
                                              @RequestParam("file") MultipartFile file){
         return fileService.uploadFile(token, folderId, file);
     }
+
+    @DeleteMapping("file/delete-file/{folderId}/{fileName}")
+    public ResponseEntity<String> deleteFile(   @RequestHeader("Authorization") String token,
+                                                @PathVariable int folderId,
+                                                @PathVariable String fileName){
+        return fileService.deleteFile(token, folderId, fileName);
+    }
 }
