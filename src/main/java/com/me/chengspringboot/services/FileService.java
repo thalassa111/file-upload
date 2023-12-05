@@ -6,13 +6,19 @@ import com.me.chengspringboot.repositories.FileRepository;
 import com.me.chengspringboot.repositories.FolderRepository;
 import com.me.chengspringboot.utilities.JwtUtil;
 import com.me.chengspringboot.utilities.StringUtil;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.net.URLConnection;
 import java.util.Optional;
 
 @Service
@@ -91,6 +97,55 @@ public class FileService {
             }
         }else {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token is not valid");
+        }
+    }
+
+    @Transactional
+    public ResponseEntity<Resource> downloadFile(String token, int folderId, String fileName) {
+        //verify if token is valid
+        if(JwtUtil.verifyToken(token)){
+            //get id from token
+            String userId = JwtUtil.getSubjectFromToken(token);
+            Optional<Folder> optionalFolder = folderRepository.findByIdAndUser_Id(folderId, Integer.parseInt(userId));
+            // Verify if the folder with correct ID exists
+            if (optionalFolder.isPresent()) {
+                // Check if the file exists in the current folder
+                /*Optional<File> optionalFile = fileRepository.findByFileNameAndFolder(fileName, optionalFolder);*/
+                Optional<File> optionalFile = null;
+                try {
+                optionalFile = fileRepository.findByFileName(fileName);
+            } catch (Exception e) {
+                    e.printStackTrace(); // Log or print the exception details
+                }
+                //check if file is there
+                if(optionalFile.isPresent()){
+                    File file = optionalFile.get();
+                    //get content from database
+                    byte[] fileContent = file.getFileContent();
+                    //create a ByteArrayResource with the file content
+                    ByteArrayResource resource = new ByteArrayResource(fileContent);
+                    //content type detection based on file extension
+                    String contentType = URLConnection.guessContentTypeFromName(fileName);
+                    //wanna be able to download any kind of file
+                    MediaType mediaType = MediaType.parseMediaType(contentType);
+                    //Content-Disposition header
+                    HttpHeaders headers = new HttpHeaders();
+                    headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + fileName);
+
+                    return ResponseEntity.ok()
+                            .headers(headers)
+                            .contentLength(fileContent.length)
+                            .contentType(mediaType)
+                            .body(resource);
+
+                    } else{
+                    return ResponseEntity.notFound().build();
+                    }
+            } else {
+                return ResponseEntity.notFound().build();
+            }
+        }else {
+            return ResponseEntity.notFound().build();
         }
     }
 }
