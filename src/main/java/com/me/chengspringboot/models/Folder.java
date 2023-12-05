@@ -13,7 +13,7 @@ public class Folder {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     public int id;
 
-    public Folder(String name, User user)  {
+    public Folder(String name, User user) {
         this.name = name;
         this.user = user;
     }

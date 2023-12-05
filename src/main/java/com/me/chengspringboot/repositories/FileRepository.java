@@ -10,9 +10,11 @@ import java.util.Optional;
 
 public interface FileRepository extends JpaRepository<File, Integer> {
     boolean existsByFileNameAndFolder(String originalFilename, Folder folder);
+
     @Transactional
     void deleteFileByFileName(String fileName);
 
     Optional<File> findByFileNameAndFolder(String fileName, Optional<Folder> optionalFolder);
+
     Optional<File> findByFileName(String fileName);
 }
