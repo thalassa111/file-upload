@@ -13,8 +13,9 @@ import org.springframework.stereotype.Service;
 public class UserService {
     private UserRepository userRepository;
     private PasswordEncoderUtil passwordEncoder;
+
     @Autowired
-    public UserService(UserRepository userRepository, PasswordEncoderUtil passwordEncoder){
+    public UserService(UserRepository userRepository, PasswordEncoderUtil passwordEncoder) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
     }
@@ -24,10 +25,10 @@ public class UserService {
         //using salt for extra security, which is recommended for this type of one way password
         String salt = BCrypt.gensalt();
         var customer = new User(userDto.getName(),
-                                userDto.getEmail(),
-                                userDto.getAddress(),
-                                passwordEncoder.encodePassword(userDto.getPassword(), salt),
-                                salt);
+                userDto.getEmail(),
+                userDto.getAddress(),
+                passwordEncoder.encodePassword(userDto.getPassword(), salt),
+                salt);
         return this.userRepository.save(customer);
     }
 
@@ -37,8 +38,7 @@ public class UserService {
             User user = userRepository.findByEmail(email);
             if (user != null) {
                 //will compare the raw password with the hashed one along with the salt, if they match, its ok
-                if(passwordEncoder.verifyPassword(password, user.password, user.getSalt())){
-                    /*System.out.println("user.getID: " + user.getId());*/
+                if (passwordEncoder.verifyPassword(password, user.password, user.getSalt())) {
                     return "Generated token: " + JwtUtil.createToken(String.valueOf(user.getId()), user.getName());
                 }
             } else {
@@ -53,24 +53,22 @@ public class UserService {
 
     public String verifyToken(String token) {
         boolean isValid = JwtUtil.verifyToken(token);
-        if(isValid){
+        if (isValid) {
             String id = JwtUtil.getSubjectFromToken(token);
             User user = userRepository.findById(Integer.parseInt(id));
             return "Token is valid name: " + user.getName() + "  id: " + user.getId();
-        }
-        else {
+        } else {
             return "invalid token";
         }
     }
 
     public boolean verifyTokenBoolean(String token) {
         boolean isValid = JwtUtil.verifyToken(token);
-        if(isValid){
+        if (isValid) {
             String id = JwtUtil.getSubjectFromToken(token);
             User user = userRepository.findById(Integer.parseInt(id));
             return true;
-        }
-        else {
+        } else {
             return false;
         }
     }
