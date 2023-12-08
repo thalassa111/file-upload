@@ -41,5 +41,5 @@ public class User {
     public String salt;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<Folder> folders = new ArrayList<>();
+    public List<Folder> folders = new ArrayList<>();
 }

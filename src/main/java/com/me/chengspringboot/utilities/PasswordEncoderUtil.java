@@ -1,5 +1,6 @@
 package com.me.chengspringboot.utilities;
 
+import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 
@@ -20,4 +21,9 @@ public class PasswordEncoderUtil {
     public boolean verifyPassword(String rawPassword, String hashedPassword, String salt) {
         return passwordEncoder.matches(rawPassword + salt, hashedPassword);
     }
+
+    public String generateSalt(){
+        return BCrypt.gensalt();
+    }
+
 }

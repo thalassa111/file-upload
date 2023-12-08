@@ -34,9 +34,4 @@ public class UserController {
     public String verifyToken(@RequestParam String token) {
         return userService.verifyToken(token);
     }
-
-    @GetMapping("/user/get-user")
-    public ResponseEntity<User> getUser(@RequestParam String token) {
-        return ResponseEntity.ok(userService.getUserByToken(token));
-    }
 }
