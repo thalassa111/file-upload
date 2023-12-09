@@ -24,8 +24,8 @@ import java.util.Optional;
 @Service
 public class FileService {
 
-    private FileRepository fileRepository;
-    private FolderRepository folderRepository;
+    public FileRepository fileRepository;
+    public FolderRepository folderRepository;
 
     @Autowired
     public FileService(FileRepository fileRepository, FolderRepository folderRepository) {
@@ -36,10 +36,12 @@ public class FileService {
     //method uploads a file, which is sent in as third argument. First argument is token, and second is the id of the folder to upload to
     public ResponseEntity<String> uploadFile(String token, int folderId, MultipartFile file) {
         //verify if token if valid
-        if (JwtUtil.verifyToken(token)) {
+        /*if (JwtUtil.verifyToken(token)) {*/
+        if(checkToken(token)){
             try {
                 //get id from token
-                String userId = JwtUtil.getSubjectFromToken(token);
+                String userId = getUserId(token);
+                /*String userId = JwtUtil.getSubjectFromToken(token);*/
                 Optional<Folder> optionalFolder = folderRepository.findByIdAndUser_Id(folderId, Integer.parseInt(userId));
                 // Verify if the folder with correct ID exists
                 if (optionalFolder.isPresent()) {
@@ -75,6 +77,14 @@ public class FileService {
         } else {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token is not valid");
         }
+    }
+
+    public boolean checkToken(String token){
+        return JwtUtil.verifyToken(token);
+    }
+
+    public String getUserId(String token){
+        return JwtUtil.getSubjectFromToken(token);
     }
 
     //method for deleting a file, the filename is sent in as third argument, and first one is token, and second one is the folderId of the file
