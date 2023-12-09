@@ -26,22 +26,22 @@ public class FileService {
 
     public FileRepository fileRepository;
     public FolderRepository folderRepository;
+    public JwtUtil jwtUtil;
 
     @Autowired
-    public FileService(FileRepository fileRepository, FolderRepository folderRepository) {
+    public FileService(FileRepository fileRepository, FolderRepository folderRepository, JwtUtil jwtUtil) {
         this.fileRepository = fileRepository;
         this.folderRepository = folderRepository;
+        this.jwtUtil = jwtUtil;
     }
 
     //method uploads a file, which is sent in as third argument. First argument is token, and second is the id of the folder to upload to
     public ResponseEntity<String> uploadFile(String token, int folderId, MultipartFile file) {
         //verify if token if valid
-        /*if (JwtUtil.verifyToken(token)) {*/
-        if(checkToken(token)){
+        if(jwtUtil.verifyToken(token)){
             try {
                 //get id from token
-                String userId = getUserId(token);
-                /*String userId = JwtUtil.getSubjectFromToken(token);*/
+                String userId = jwtUtil.getSubjectFromToken(token);
                 Optional<Folder> optionalFolder = folderRepository.findByIdAndUser_Id(folderId, Integer.parseInt(userId));
                 // Verify if the folder with correct ID exists
                 if (optionalFolder.isPresent()) {
@@ -79,20 +79,12 @@ public class FileService {
         }
     }
 
-    public boolean checkToken(String token){
-        return JwtUtil.verifyToken(token);
-    }
-
-    public String getUserId(String token){
-        return JwtUtil.getSubjectFromToken(token);
-    }
-
     //method for deleting a file, the filename is sent in as third argument, and first one is token, and second one is the folderId of the file
     public ResponseEntity<String> deleteFile(String token, int folderId, String fileName) {
         //verify if token is valid
-        if (JwtUtil.verifyToken(token)) {
+        if(jwtUtil.verifyToken(token)){
             //get id from token
-            String userId = JwtUtil.getSubjectFromToken(token);
+            String userId = jwtUtil.getSubjectFromToken(token);
             Optional<Folder> optionalFolder = folderRepository.findByIdAndUser_Id(folderId, Integer.parseInt(userId));
             // Verify if the folder with correct ID exists
             if (optionalFolder.isPresent()) {
@@ -116,9 +108,9 @@ public class FileService {
     @Transactional
     public ResponseEntity<Resource> downloadFile(String token, int folderId, String fileName) {
         //verify if token is valid
-        if (JwtUtil.verifyToken(token)) {
+        if(jwtUtil.verifyToken(token)){
             //get id from token
-            String userId = JwtUtil.getSubjectFromToken(token);
+            String userId = jwtUtil.getSubjectFromToken(token);
             Optional<Folder> optionalFolder = folderRepository.findByIdAndUser_Id(folderId, Integer.parseInt(userId));
             // Verify if the folder with correct ID exists
             if (optionalFolder.isPresent()) {
