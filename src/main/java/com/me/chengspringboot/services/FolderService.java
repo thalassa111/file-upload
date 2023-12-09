@@ -1,5 +1,8 @@
 package com.me.chengspringboot.services;
 
+import com.me.chengspringboot.exceptions.FolderAlreadyExistsException;
+import com.me.chengspringboot.exceptions.InvalidFolderInputException;
+import com.me.chengspringboot.exceptions.UnauthorizedTokenException;
 import com.me.chengspringboot.models.Folder;
 import com.me.chengspringboot.models.User;
 import com.me.chengspringboot.repositories.FolderRepository;
@@ -8,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 @Service
 public class FolderService {
@@ -25,27 +29,37 @@ public class FolderService {
 
     //for creating a folder, takes in token and the name of folder to be created
     public ResponseEntity<String> createFolder(String token, String folderName) {
-        //check if token is a valid one
-        if (jwtUtil.verifyToken(token)) {
-            //extract the user from token
+        try {
+            //check if token is ok, and folderName exists
+            validateFolderCreationInput(token, folderName);
+            //extract user from token
             User user = userService.getUserByToken(token);
-            //last one is for checking if there are folders with same name, dont want that
-            if (folderName != null && !folderName.isEmpty() && !folderRepository.existsByNameAndUser(folderName, user)) {
-                try {
-                    //creates a new folder, using the provided foldername, and then get a user through the token
-                    var folder = new Folder(folderName, user);
-                    //save to repo
-                    this.folderRepository.save(folder);
-                    return ResponseEntity.ok("Folder created: " + folder.getName());
-                } catch (Exception e) {
-                    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                            .body("Error creating folder: " + e.getMessage());
-                }
+            //check if there is a folder with user and folder, if its ok, create folder
+            if (!folderRepository.existsByNameAndUser(folderName, user)) {
+                Folder folder = new Folder(folderName.trim(), user);
+                //save to repo
+                folderRepository.save(folder);
+                return ResponseEntity.ok("Folder created: " + folder.getName());
             } else {
-                return ResponseEntity.badRequest().body("Folder name cannot be null, empty or have the same name");
+                throw new FolderAlreadyExistsException("Folder with the same name already exists");
             }
-        } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token is not valid");
+        } catch (InvalidFolderInputException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (UnauthorizedTokenException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
+        } catch (FolderAlreadyExistsException e){
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Some error when creating folder");
+        }
+    }
+
+    private void validateFolderCreationInput(String token, String folderName) {
+        if (!StringUtils.hasText(folderName)) {
+            throw new InvalidFolderInputException("Folder name cannot be null or empty");
+        }
+        if (!jwtUtil.verifyToken(token)) {
+            throw new UnauthorizedTokenException("Token is not valid");
         }
     }
 }
