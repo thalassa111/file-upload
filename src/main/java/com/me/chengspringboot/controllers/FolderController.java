@@ -15,7 +15,8 @@ public class FolderController {
     public FolderController(FolderService folderService) { this.folderService = folderService; }
 
     @PostMapping("/folder/create-folder")
-    public ResponseEntity<String> createFolder(@RequestHeader("Authorization") String token, @RequestBody FolderRequestDto folderRequest) {
+    public ResponseEntity<String> createFolder(@RequestHeader("Authorization") String token,
+                                               @RequestBody FolderRequestDto folderRequest) {
         return folderService.createFolder(token, folderRequest.getFolderName());
     }
 }
