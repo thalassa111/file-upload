@@ -14,11 +14,13 @@ import java.util.Optional;
 public class UserService {
     public UserRepository userRepository;
     public PasswordEncoderUtil passwordEncoder;
+    public JwtUtil jwtUtil;
 
     @Autowired
-    public UserService(UserRepository userRepository, PasswordEncoderUtil passwordEncoder) {
+    public UserService(UserRepository userRepository, PasswordEncoderUtil passwordEncoder, JwtUtil jwtUtil) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.jwtUtil = jwtUtil;
     }
 
     //creates a new user using userDto
@@ -53,9 +55,9 @@ public class UserService {
     }
 
     public String verifyToken(String token) {
-        boolean isValid = JwtUtil.verifyToken(token);
+        boolean isValid = jwtUtil.verifyToken(token);
         if (isValid) {
-            String id = JwtUtil.getSubjectFromToken(token);
+            String id = jwtUtil.getSubjectFromToken(token);
             Optional<User> optionalUser = userRepository.findById(Integer.parseInt(id));
             User user = optionalUser.orElse(null);
             return "Token is valid name: " + user.getName() + "  id: " + user.getId();
@@ -66,7 +68,7 @@ public class UserService {
 
     public User getUserByToken(String token) {
         //gets id from token
-        String subject = JwtUtil.getSubjectFromToken(token);
+        String subject = jwtUtil.getSubjectFromToken(token);
         Optional<User> optionalUser = userRepository.findById(Integer.parseInt(subject));
         User user = optionalUser.orElse(null);
         return user;

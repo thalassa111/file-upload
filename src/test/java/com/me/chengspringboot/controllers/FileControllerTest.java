@@ -28,8 +28,9 @@ public class FileControllerTest {
     @MockBean
     private FileService fileService;
 
+    //test for upload file endpoint
     @Test
-    void testUploadFile() throws Exception {
+    void uploadFile() throws Exception {
         //given - mock data
         String token = "test-token";
         int folderId = 1;
@@ -46,5 +47,26 @@ public class FileControllerTest {
         mockMvc.perform(request)
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.content().string("File uploaded successfully"));
+    }
+
+    //test for delete file endpoint
+    @Test
+    void deleteFile() throws Exception {
+        //given - mock data
+        String token = "test-token";
+        int folderId = 1;
+        String fileName = "testfile.txt";
+
+        //when - mock delete file method
+        when(fileService.deleteFile(token, folderId, fileName)).thenReturn(ResponseEntity.ok("File deleted successfully"));
+
+        //mocked HTTP request to the endpoint under test
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.delete("/file/delete-file/{folderId}/{fileName}", folderId, fileName)
+                .header("Authorization", token);
+
+        //then - perform the HTTP request and assertions
+        mockMvc.perform(request)
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.content().string("File deleted successfully"));
     }
 }

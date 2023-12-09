@@ -9,6 +9,5 @@ import java.util.Optional;
 public interface FolderRepository extends JpaRepository<Folder, Integer> {
 
     boolean existsByNameAndUser(String folderName, User user);
-
     Optional<Folder> findByIdAndUser_Id(int folderId, int userId);
 }

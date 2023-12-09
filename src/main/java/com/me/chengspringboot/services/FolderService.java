@@ -14,17 +14,19 @@ public class FolderService {
 
     private FolderRepository folderRepository;
     private UserService userService;
+    private JwtUtil jwtUtil;
 
     @Autowired
-    public FolderService(FolderRepository folderRepository, UserService userService) {
+    public FolderService(FolderRepository folderRepository, UserService userService, JwtUtil jwtUtil) {
         this.folderRepository = folderRepository;
         this.userService = userService;
+        this.jwtUtil = jwtUtil;
     }
 
     //for creating a folder, takes in token and the name of folder to be created
     public ResponseEntity<String> createFolder(String token, String folderName) {
         //check if token is a valid one
-        if (JwtUtil.verifyToken(token)) {
+        if (jwtUtil.verifyToken(token)) {
             //extract the user from token
             User user = userService.getUserByToken(token);
             //last one is for checking if there are folders with same name, dont want that

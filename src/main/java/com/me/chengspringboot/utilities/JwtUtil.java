@@ -6,9 +6,11 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTDecodeException;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
+import org.springframework.stereotype.Component;
 
 import java.util.Date;
 
+@Component
 public class JwtUtil {
 
     private static final String secret = "super-secret-key";
@@ -22,7 +24,7 @@ public class JwtUtil {
                 .sign(algorithm);
     }
 
-    public static boolean verifyToken(String token) {
+    public boolean verifyToken(String token) {
         try {
             Algorithm algorithm = Algorithm.HMAC256(secret);
             JWTVerifier verifier = JWT.require(algorithm)
@@ -35,7 +37,7 @@ public class JwtUtil {
     }
 
     //returns the subject(id) from token
-    public static String getSubjectFromToken(String token) {
+    public String getSubjectFromToken(String token) {
         try {
             Algorithm algorithm = Algorithm.HMAC256(secret);
             JWTVerifier verifier = JWT.require(algorithm).build();

@@ -24,9 +24,10 @@ class UserControllerTest {
     @Mock
     private UserService userService;
 
+    //test for adding user
     @Test
     void addUser() {
-        //create mock user with data
+        //given - create mock user with data
         User mockUser = new User();
         mockUser.setName("Pelle Svanslös");
         mockUser.setEmail("pelle@svans.se");
@@ -34,10 +35,10 @@ class UserControllerTest {
         //createCustomer method will always return the mocked user
         when(userService.createCustomer(any(UserDto.class))).thenReturn(mockUser);
 
-        //when .addUser endpoint is called, it will call on .createCustomer internally, which is mocked with above data
+        //when - .addUser endpoint is called, it will call on .createCustomer internally, which is mocked with above data
         ResponseEntity<String> responseEntity = userController.addUser(new UserDto());
 
-        //assertions
+        //then - assertions
         assertEquals("customer added: Pelle Svanslös", responseEntity.getBody());
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
         assertEquals("Pelle Svanslös", mockUser.getName());
