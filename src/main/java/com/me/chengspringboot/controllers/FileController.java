@@ -32,9 +32,9 @@ public class FileController {
     }
 
     @GetMapping("/file/download-file/{folderId}/{fileName}")
-    public ResponseEntity<Resource> downloadFile(@RequestHeader("Authorization") String token,
-                                                 @PathVariable int folderId,
-                                                 @PathVariable String fileName) {
+    public ResponseEntity<Resource> downloadFile( @RequestHeader("Authorization") String token,
+                                                @PathVariable int folderId,
+                                                @PathVariable String fileName) {
         return fileService.downloadFile(token, folderId, fileName);
     }
 
