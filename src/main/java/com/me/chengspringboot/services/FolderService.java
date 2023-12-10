@@ -50,7 +50,7 @@ public class FolderService {
             return ResponseEntity.badRequest().body(e.getMessage());
         } catch (UnauthorizedTokenException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
-        } catch (FolderAlreadyExistsException e){
+        } catch (FolderAlreadyExistsException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Some error when creating folder");
