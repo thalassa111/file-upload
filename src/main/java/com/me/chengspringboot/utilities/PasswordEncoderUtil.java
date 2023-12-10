@@ -22,7 +22,7 @@ public class PasswordEncoderUtil {
         return passwordEncoder.matches(rawPassword + salt, hashedPassword);
     }
 
-    public String generateSalt(){
+    public String generateSalt() {
         return BCrypt.gensalt();
     }
 

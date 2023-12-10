@@ -149,7 +149,7 @@ public class FileService {
     }
 
     //validation of token
-    private void validateToken(String token){
+    private void validateToken(String token) {
         if (!jwtUtil.verifyToken(token)) {
             throw new UnauthorizedTokenException("Token is not valid");
         }

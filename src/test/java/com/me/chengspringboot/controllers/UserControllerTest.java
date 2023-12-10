@@ -33,7 +33,7 @@ class UserControllerTest {
         mockUser.setEmail("pelle@svans.se");
         mockUser.setAddress("kattgatan 11");
         //createCustomer method will always return the mocked user
-        when(userService.createCustomer(any(UserDto.class))).thenReturn(mockUser);
+        when(userService.createUser(any(UserDto.class))).thenReturn(mockUser);
 
         //when - .addUser endpoint is called, it will call on .createCustomer internally, which is mocked with above data
         ResponseEntity<String> responseEntity = userController.addUser(new UserDto());

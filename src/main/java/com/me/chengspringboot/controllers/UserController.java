@@ -14,13 +14,15 @@ public class UserController {
     private UserService userService;
 
     @Autowired
-    public UserController(UserService userService) { this.userService = userService; }
+    public UserController(UserService userService) {
+        this.userService = userService;
+    }
 
     //register a new user
     @PostMapping("/user/register")
     public ResponseEntity<String> addUser(@RequestBody UserDto userDto) {
-        User tmp = userService.createCustomer(userDto);
-        return ResponseEntity.ok("customer added: " + tmp.getName());
+        User tmp = userService.createUser(userDto);
+        return ResponseEntity.ok("user added: " + tmp.getName());
     }
 
     //will generate a token for a user who provide a correct email and password

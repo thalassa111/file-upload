@@ -17,6 +17,7 @@ public class FileController {
         this.fileService = fileService;
     }
 
+    //to upload file, takes in token in header, then the folderId and lastly the actual file
     @PostMapping("/file/upload-file/{folderId}")
     public ResponseEntity<String> uploadFile(@RequestHeader("Authorization") String token,
                                              @PathVariable int folderId,
@@ -24,6 +25,7 @@ public class FileController {
         return fileService.uploadFile(token, folderId, file);
     }
 
+    //to delete file, takes in token in header, then folder id and filename as pathvariables
     @DeleteMapping("/file/delete-file/{folderId}/{fileName}")
     public ResponseEntity<String> deleteFile(@RequestHeader("Authorization") String token,
                                              @PathVariable int folderId,
@@ -31,10 +33,11 @@ public class FileController {
         return fileService.deleteFile(token, folderId, fileName);
     }
 
+    //to download file, takes in token in header, then folderId and the filename as pathvariables
     @GetMapping("/file/download-file/{folderId}/{fileName}")
-    public ResponseEntity<Resource> downloadFile( @RequestHeader("Authorization") String token,
-                                                @PathVariable int folderId,
-                                                @PathVariable String fileName) {
+    public ResponseEntity<Resource> downloadFile(@RequestHeader("Authorization") String token,
+                                                 @PathVariable int folderId,
+                                                 @PathVariable String fileName) {
         return fileService.downloadFile(token, folderId, fileName);
     }
 
