@@ -32,11 +32,14 @@ public class FolderService {
         try {
             //check if token is ok, and folderName exists
             validateFolderCreationInput(token, folderName);
+
             //extract user from token
             User user = userService.getUserByToken(token);
+
             //check if there is a folder with user and folder, if its ok, create folder
             if (!folderRepository.existsByNameAndUser(folderName, user)) {
                 Folder folder = new Folder(folderName.trim(), user);
+
                 //save to repo
                 folderRepository.save(folder);
                 return ResponseEntity.ok("Folder created: " + folder.getName());
